@@ -1,0 +1,30 @@
+<apex:page controller="StudentController">
+
+    <apex:form>
+        <apex:inputField value="{!s.Name}"/>
+        <apex:inputField value="{!s.Roll_No__c}"/>
+        <apex:inputField value="{!s.Class__c}"/>
+        <apex:inputField value="{!s.Mobile_No__c}"/>
+        <apex:commandButton value="Save" action="{!save}"/>
+    </apex:form>
+
+    <apex:form>
+        <apex:dataTable value="{!sList}" var="r">
+            <apex:column value="{!r.Name}"/>
+            <apex:column value="{!r.Roll_No__c}"/>
+            <apex:column value="{!r.Class__c}"/>
+            <apex:column value="{!r.Mobile_No__c}"/>
+            <apex:column>
+                <apex:commandButton value="Edit" action="{!edit}">
+                    <apex:param name="i" value="{!r.Id}"/>
+                </apex:commandButton>
+            </apex:column>
+            <apex:column>
+                <apex:commandButton value="Delete" action="{!del}">
+                    <apex:param name="i" value="{!r.Id}"/>
+                </apex:commandButton>
+            </apex:column>
+        </apex:dataTable>
+    </apex:form>
+
+</apex:page>

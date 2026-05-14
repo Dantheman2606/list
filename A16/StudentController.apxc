@@ -1,0 +1,25 @@
+public class StudentController {
+    public Student__c s { get; set; }
+    public List<Student__c> sList { get; set; }
+
+    public StudentController() {
+        s = new Student__c();
+        sList = [SELECT Id, Name, Roll_No__c, Class__c, Mobile_No__c FROM Student__c];
+    }
+
+    public void save() {
+        upsert s;
+        s = new Student__c();
+        sList = [SELECT Id, Name, Roll_No__c, Class__c, Mobile_No__c FROM Student__c];
+    }
+
+    public void del() {
+        delete [SELECT Id FROM Student__c WHERE Id = :ApexPages.currentPage().getParameters().get('i')];
+        sList = [SELECT Id, Name, Roll_No__c, Class__c, Mobile_No__c FROM Student__c];
+    }
+
+    public void edit() {
+        s = [SELECT Id, Name, Roll_No__c, Class__c, Mobile_No__c FROM Student__c
+             WHERE Id = :ApexPages.currentPage().getParameters().get('i')];
+    }
+}
