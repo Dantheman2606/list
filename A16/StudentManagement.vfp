@@ -1,30 +1,41 @@
 <apex:page controller="StudentController">
 
-    <apex:form>
-        <apex:inputField value="{!s.Name}"/>
-        <apex:inputField value="{!s.Roll_No__c}"/>
-        <apex:inputField value="{!s.Class__c}"/>
-        <apex:inputField value="{!s.Mobile_No__c}"/>
-        <apex:commandButton value="Save" action="{!save}"/>
-    </apex:form>
+    <h2>Student Management System</h2>
 
     <apex:form>
-        <apex:dataTable value="{!sList}" var="r">
-            <apex:column value="{!r.Name}"/>
-            <apex:column value="{!r.Roll_No__c}"/>
-            <apex:column value="{!r.Class__c}"/>
-            <apex:column value="{!r.Mobile_No__c}"/>
-            <apex:column>
-                <apex:commandButton value="Edit" action="{!edit}">
-                    <apex:param name="i" value="{!r.Id}"/>
-                </apex:commandButton>
-            </apex:column>
-            <apex:column>
-                <apex:commandButton value="Delete" action="{!del}">
-                    <apex:param name="i" value="{!r.Id}"/>
-                </apex:commandButton>
-            </apex:column>
-        </apex:dataTable>
+
+        <apex:pageBlock title="Student Form">
+            <apex:pageBlockSection columns="1">
+                <apex:inputField value="{!s.Name}" label="Student Name"/>
+                <apex:inputField value="{!s.Roll_No__c}" label="Roll No"/>
+                <apex:inputField value="{!s.Class__c}" label="Class"/>
+                <apex:inputField value="{!s.Mobile_No__c}" label="Mobile No"/>
+            </apex:pageBlockSection>
+            <br/>
+            <apex:commandButton value="Save" action="{!save}"/>
+        </apex:pageBlock>
+
+        <br/>
+
+        <apex:pageBlock title="All Students">
+            <apex:pageBlockTable value="{!sList}" var="r">
+                <apex:column headerValue="Name"      value="{!r.Name}"/>
+                <apex:column headerValue="Roll No"   value="{!r.Roll_No__c}"/>
+                <apex:column headerValue="Class"     value="{!r.Class__c}"/>
+                <apex:column headerValue="Mobile No" value="{!r.Mobile_No__c}"/>
+                <apex:column headerValue="Edit">
+                    <apex:commandLink value="Edit" action="{!edit}">
+                        <apex:param name="i" value="{!r.Id}" assignTo="{!selectedId}"/>
+                    </apex:commandLink>
+                </apex:column>
+                <apex:column headerValue="Delete">
+                    <apex:commandLink value="Delete" action="{!del}">
+                        <apex:param name="i" value="{!r.Id}" assignTo="{!selectedId}"/>
+                    </apex:commandLink>
+                </apex:column>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+
     </apex:form>
 
 </apex:page>
