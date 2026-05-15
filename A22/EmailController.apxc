@@ -1,0 +1,64 @@
+public class EmailController {
+
+    public String toAddress { get; set; }
+    public String subject   { get; set; }
+    public String body      { get; set; }
+    public String statusMsg { get; set; }
+    public Boolean isError  { get; set; }
+    public transient Blob fileBody { get; set; }
+    public String fileName         { get; set; }
+
+    public EmailController() {
+        isError   = false;
+        statusMsg = '';
+    }
+
+    private Boolean isValidEmail(String email) {
+        String regex = '^[a-zA-Z0-9._|\\%#~`=?&/$^*!}{+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$';
+        return Pattern.compile(regex).matcher(email).matches();
+    }
+
+    public PageReference sendEmail() {
+        isError   = false;
+        statusMsg = '';
+
+        if (String.isBlank(toAddress) || !isValidEmail(toAddress)) {
+            isError   = true;
+            statusMsg = 'Invalid email address. Please enter a valid email like user@example.com';
+            return null;
+        }
+        if (String.isBlank(subject)) {
+            isError   = true;
+            statusMsg = 'Subject cannot be empty.';
+            return null;
+        }
+        if (String.isBlank(body)) {
+            isError   = true;
+            statusMsg = 'Message body cannot be empty.';
+            return null;
+        }
+
+        try {
+            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+            mail.setToAddresses(new String[]{ toAddress });
+            mail.setSubject(subject);
+            mail.setPlainTextBody(body);
+
+            if (fileBody != null && !String.isBlank(fileName)) {
+                Messaging.EmailFileAttachment att = new Messaging.EmailFileAttachment();
+                att.setFileName(fileName);
+                att.setBody(fileBody);
+                mail.setFileAttachments(new Messaging.EmailFileAttachment[]{ att });
+            }
+
+            Messaging.sendEmail(new Messaging.SingleEmailMessage[]{ mail });
+            statusMsg = 'Email sent successfully to ' + toAddress;
+
+        } catch (Exception e) {
+            isError   = true;
+            statusMsg = 'Error: ' + e.getMessage();
+        }
+
+        return null;
+    }
+}

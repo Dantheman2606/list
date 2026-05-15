@@ -1,0 +1,64 @@
+public class EmailNotificationService {
+    
+    // ── Method 1: Send WITHOUT Attachment ──────────────────────────
+    public static void sendEmail(String toAddress, String subject, String body) {
+        
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        
+        mail.setToAddresses(new String[] { toAddress });
+        mail.setSubject(subject);
+        mail.setPlainTextBody(body);
+        
+        Messaging.SendEmailResult[] results = Messaging.sendEmail(
+            new Messaging.SingleEmailMessage[] { mail }
+        );
+        
+        if (results[0].isSuccess()) {
+            System.debug('Email sent successfully to: ' + toAddress);
+        } else {
+            System.debug('Failed: ' + results[0].getErrors()[0].getMessage());
+        }
+    }
+    
+    // ── Method 2: Send WITH Attachment ─────────────────────────────
+    public static void sendEmailWithAttachment(String toAddress, String subject, String body, String fileName, String fileContent) {
+        
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        
+        mail.setToAddresses(new String[] { toAddress });
+        mail.setSubject(subject);
+        mail.setPlainTextBody(body);
+        
+        // Build attachment
+        Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
+        attachment.setFileName(fileName);
+        attachment.setBody(Blob.valueOf(fileContent));
+        attachment.setContentType('text/plain');
+        
+        mail.setFileAttachments(new Messaging.EmailFileAttachment[] { attachment });
+        
+        Messaging.SendEmailResult[] results = Messaging.sendEmail(
+            new Messaging.SingleEmailMessage[] { mail }
+        );
+        
+        if (results[0].isSuccess()) {
+            System.debug('Email with attachment sent successfully to: ' + toAddress);
+        } else {
+            System.debug('Failed: ' + results[0].getErrors()[0].getMessage());
+        }
+    }
+}
+
+//EmailNotificationService.sendEmail(
+//    'your_email@gmail.com',
+//    'Hello from Apex Class',
+//    'This email was sent by calling a method from the Apex class.'
+//);
+//
+//EmailNotificationService.sendEmailWithAttachment(
+//    'your_email@gmail.com',
+//    'Apex Email with File',
+//    'Please find the attached report.',
+//    'Report.txt',
+//    'Name: Daniel\nCourse: CS\nCollege: PICT\nThis file was attached via Apex code.'
+//);

@@ -1,0 +1,44 @@
+<apex:page controller="EmailController">
+<apex:form enctype="multipart/form-data">
+
+    <h2>Send Email Notification</h2>
+
+    <apex:outputPanel rendered="{!statusMsg != ''}">
+        <apex:outputText value="{!statusMsg}"
+            style="{!IF(isError, 'color:red;', 'color:green;')}"/>
+        <br/><br/>
+    </apex:outputPanel>
+
+    <apex:pageBlock title="Compose Email">
+        <apex:pageBlockSection columns="1">
+
+            <apex:pageBlockSectionItem>
+                <apex:outputLabel value="To"/>
+                <apex:inputText value="{!toAddress}"/>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem>
+                <apex:outputLabel value="Subject"/>
+                <apex:inputText value="{!subject}"/>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem>
+                <apex:outputLabel value="Message Body"/>
+                <apex:inputTextarea value="{!body}" rows="6" cols="60"/>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem>
+                <apex:outputLabel value="Attachment (Optional)"/>
+                <apex:inputFile value="{!fileBody}" filename="{!fileName}"/>
+            </apex:pageBlockSectionItem>
+
+        </apex:pageBlockSection>
+
+        <apex:pageBlockButtons>
+            <apex:commandButton value="Send Email" action="{!sendEmail}"/>
+        </apex:pageBlockButtons>
+
+    </apex:pageBlock>
+
+</apex:form>
+</apex:page>
