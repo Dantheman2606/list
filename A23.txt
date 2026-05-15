@@ -1,0 +1,120 @@
+COLLEGE MANAGEMENT LIGHTNING APP - QUICK STEPS
+================================================
+
+STEP 0 - GET A FREE ORG
+- Go to developer.salesforce.com/signup
+- Sign up for Developer Edition
+- Log in → click gear icon (top right) → Setup
+
+------------------------------------------------
+STEP 1 - CREATE STUDENT OBJECT
+- Setup → Quick Find → "Object Manager"
+- Create → Custom Object
+- Label: Student | Plural: Students
+- Check "Launch New Custom Tab Wizard after saving" → Save
+- In the Tab wizard, pick any icon → Next → Save
+
+------------------------------------------------
+STEP 2 - ADD STUDENT FIELDS
+Object Manager → Student → Fields & Relationships → New
+
+| Field Label  | Data Type | Notes             |
+|--------------|-----------|-------------------|
+| Roll Number  | Number    | Decimal Places: 0 |
+| Email        | Email     | -                 |
+| Marks        | Number    | Decimal Places: 2 |
+| Department   | Picklist  | Values: CSE, IT, ENTC, Mechanical, Civil |
+
+(Name field already exists by default)
+
+------------------------------------------------
+STEP 3 - ADD STUDENT VALIDATION RULES
+Object Manager → Student → Validation Rules → New
+
+Rule 1: Roll_Number_Must_Be_Positive
+  Formula:  Roll_Number__c <= 0
+  Message:  Roll number must be greater than 0
+
+Rule 2: Marks_Range
+  Formula:  OR(Marks__c < 0, Marks__c > 100)
+  Message:  Marks must be between 0 and 100
+
+Rule 3: Email_Must_Have_At
+  Formula:  NOT(CONTAINS(Email__c, "@"))
+  Message:  Email must contain the @ symbol
+
+Rule 4: Name_Cannot_Be_Blank
+  Formula:  ISBLANK(Name)
+  Message:  Student name cannot be blank
+
+------------------------------------------------
+STEP 4 - CREATE FACULTY OBJECT
+- Object Manager → Create → Custom Object
+- Label: Faculty | Plural: Faculty
+- Check "Launch New Custom Tab Wizard after saving" → Save
+- Pick any icon in Tab wizard → Save
+
+------------------------------------------------
+STEP 5 - ADD FACULTY FIELDS
+Object Manager → Faculty → Fields & Relationships → New
+
+| Field Label  | Data Type | Notes                          |
+|--------------|-----------|--------------------------------|
+| Faculty ID   | Number    | Decimal Places: 0, check Unique|
+| Salary       | Currency  | Decimal Places: 2              |
+| Department   | Picklist  | Values: CSE, IT, ENTC, Mechanical, Civil |
+| Joining Date | Date      | -                              |
+
+(Name field already exists by default)
+
+------------------------------------------------
+STEP 6 - ADD FACULTY VALIDATION RULES
+Object Manager → Faculty → Validation Rules → New
+
+Rule 1: Faculty_Name_Min_Length
+  Formula:  OR(ISBLANK(Name), LEN(Name) < 3)
+  Message:  Faculty name cannot be empty and must have at least 3 characters
+
+Rule 2: Faculty_ID_Positive
+  Formula:  Faculty_ID__c <= 0
+  Message:  Faculty ID must be greater than 0
+
+Rule 3: Salary_Range
+  Formula:  OR(Salary__c <= 10000, Salary__c >= 500000)
+  Message:  Salary must be greater than 10,000 and less than 5,00,000
+
+Rule 4: Joining_Date_Not_Future
+  Formula:  Joining_Date__c > TODAY()
+  Message:  Joining date cannot be a future date
+
+Rule 5: Department_Required
+  Formula:  ISBLANK(TEXT(Department__c))
+  Message:  Department must be selected
+
+------------------------------------------------
+STEP 7 - CREATE TABS (if not already created in Step 1/4)
+- Setup → Quick Find → "Tabs"
+- Under Custom Object Tabs → New
+- Select Student object → pick icon → Save
+- Repeat for Faculty object
+
+------------------------------------------------
+STEP 8 - CREATE THE LIGHTNING APP
+- Setup → Quick Find → "App Manager"
+- Click New Lightning App
+- App Name: College Management → Next
+- Skip branding → Next
+- Navigation Items screen:
+    → Search "Student" in the left box
+    → Click Students → click ▶ to move to Selected Items
+    → Search "Faculty" → click Faculty → click ▶
+- Next → assign to System Administrator profile → Save & Finish
+
+------------------------------------------------
+STEP 9 - OPEN YOUR APP
+- Click App Launcher (9-dot grid, top left)
+- Search "College Management" → open it
+- Test by clicking New on Student/Faculty tabs
+- Try invalid data to confirm validation rules fire
+
+================================================
