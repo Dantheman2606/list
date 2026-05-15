@@ -1,0 +1,149 @@
+// ============================================================
+//  STEP 1 — Create the Custom Object in Salesforce Setup
+//  Object API Name : Bank_Account__c
+//  Name Field      : Auto Number → Format: ACC-{0000}  (Account ID)
+//  Custom Fields:
+//    Customer_Name__c  (Text, 100)
+//    Email__c          (Email)
+//    Birth_Date__c     (Date)
+//    Account_Type__c   (Picklist: Savings / Current / Fixed Deposit)
+//    Balance__c        (Currency, 16,2)
+// ============================================================
+
+public class BankAccountSystem {
+
+    // ── 1. OPEN (Create) Account ──────────────────────────────────────────
+    public static void openAccount(String custName, String email, Date dob,
+                                   String accType, Decimal initialDeposit) {
+        Bank_Account__c acc = new Bank_Account__c(
+            Customer_Name__c = custName,
+            Email__c         = email,
+            Birth_Date__c    = dob,
+            Account_Type__c  = accType,
+            Balance__c       = initialDeposit
+        );
+        insert acc;
+        System.debug('Account opened! Account No: ' + acc.Name
+                   + ' | Balance: ' + initialDeposit);
+    }
+
+    // ── 2. VIEW ALL Accounts ──────────────────────────────────────────────
+    public static void viewAllAccounts() {
+        List<Bank_Account__c> accList = [
+            SELECT Name, Customer_Name__c, Email__c, Birth_Date__c,
+                   Account_Type__c, Balance__c
+            FROM Bank_Account__c
+            ORDER BY Name
+        ];
+
+        if (accList.isEmpty()) {
+            System.debug('No accounts found.');
+            return;
+        }
+
+        System.debug('===== All Bank Accounts =====');
+        for (Bank_Account__c a : accList) {
+            System.debug(
+                'Acc No: '      + a.Name
+              + ' | Name: '     + a.Customer_Name__c
+              + ' | Email: '    + a.Email__c
+              + ' | DOB: '      + a.Birth_Date__c
+              + ' | Type: '     + a.Account_Type__c
+              + ' | Balance: '  + a.Balance__c
+            );
+        }
+    }
+
+    // ── 3. SEARCH Account by Account No (e.g. 'ACC-0001') ────────────────
+    public static void searchAccount(String accNo) {
+        List<Bank_Account__c> result = [
+            SELECT Name, Customer_Name__c, Email__c, Birth_Date__c,
+                   Account_Type__c, Balance__c
+            FROM Bank_Account__c
+            WHERE Name = :accNo
+            LIMIT 1
+        ];
+
+        if (result.isEmpty()) {
+            System.debug('Account ' + accNo + ' not found.');
+        } else {
+            Bank_Account__c a = result[0];
+            System.debug(
+                'Acc No: '     + a.Name
+              + ' | Name: '    + a.Customer_Name__c
+              + ' | Email: '   + a.Email__c
+              + ' | DOB: '     + a.Birth_Date__c
+              + ' | Type: '    + a.Account_Type__c
+              + ' | Balance: ' + a.Balance__c
+            );
+        }
+    }
+
+    // ── 4. DEPOSIT ────────────────────────────────────────────────────────
+    public static void deposit(String accNo, Decimal amount) {
+        if (amount <= 0) { System.debug('Deposit amount must be positive.'); return; }
+
+        List<Bank_Account__c> result = [
+            SELECT Id, Balance__c FROM Bank_Account__c WHERE Name = :accNo LIMIT 1
+        ];
+
+        if (result.isEmpty()) { System.debug('Account ' + accNo + ' not found.'); return; }
+
+        result[0].Balance__c += amount;
+        update result[0];
+        System.debug('Deposited ' + amount + ' to ' + accNo
+                   + ' | New Balance: ' + result[0].Balance__c);
+    }
+
+    // ── 5. WITHDRAW ───────────────────────────────────────────────────────
+    public static void withdraw(String accNo, Decimal amount) {
+        if (amount <= 0) { System.debug('Withdrawal amount must be positive.'); return; }
+
+        List<Bank_Account__c> result = [
+            SELECT Id, Balance__c FROM Bank_Account__c WHERE Name = :accNo LIMIT 1
+        ];
+
+        if (result.isEmpty()) { System.debug('Account ' + accNo + ' not found.'); return; }
+
+        if (result[0].Balance__c < amount) {
+            System.debug('Insufficient balance. Current balance: ' + result[0].Balance__c);
+            return;
+        }
+
+        result[0].Balance__c -= amount;
+        update result[0];
+        System.debug('Withdrew ' + amount + ' from ' + accNo
+                   + ' | New Balance: ' + result[0].Balance__c);
+    }
+
+    // ── 6. CLOSE (Delete) Account ─────────────────────────────────────────
+    public static void closeAccount(String accNo) {
+        List<Bank_Account__c> result = [
+            SELECT Id FROM Bank_Account__c WHERE Name = :accNo LIMIT 1
+        ];
+
+        if (result.isEmpty()) { System.debug('Account ' + accNo + ' not found.'); return; }
+
+        delete result[0];
+        System.debug('Account ' + accNo + ' closed and deleted.');
+    }
+}
+
+// Open accounts
+// BankAccountSystem.openAccount('Alice', 'alice@bank.com', Date.newInstance(1995, 4, 10), 'Savings', 5000);
+// BankAccountSystem.openAccount('Bob', 'bob@bank.com', Date.newInstance(1990, 8, 22), 'Current', 10000);
+
+// View all
+// BankAccountSystem.viewAllAccounts();
+
+// Search
+// BankAccountSystem.searchAccount('ACC-0001');
+
+// Deposit
+// BankAccountSystem.deposit('ACC-0001', 2000);
+
+// Withdraw
+// BankAccountSystem.withdraw('ACC-0001', 1000);
+
+// Close account
+// BankAccountSystem.closeAccount('ACC-0002');

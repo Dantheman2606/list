@@ -1,0 +1,120 @@
+// ============================================================
+//  STEP 1 — Create the Custom Object in Salesforce Setup
+//  Object API Name : Employee__c
+//  Fields:
+//    Emp_Name__c   (Text, 100)
+//    Email__c      (Email)
+//    Birth_Date__c (Date)
+//    Department__c (Text, 100)
+//  (Emp ID = the auto-generated Name field, e.g. EMP-0001)
+// ============================================================
+
+public class EmployeeManagementSystem {
+
+    // ── 1. ADD Employee ───────────────────────────────────────────────────
+    public static void addEmployee(String name, String email, Date dob, String dept) {
+        Employee__c emp = new Employee__c(
+            Emp_Name__c   = name,
+            Email__c      = email,
+            Birth_Date__c = dob,
+            Department__c = dept
+        );
+        insert emp;
+        System.debug('Employee added with ID: ' + emp.Name);
+    }
+
+    // ── 2. VIEW ALL Employees ─────────────────────────────────────────────
+    public static void viewAllEmployees() {
+        List<Employee__c> empList = [
+            SELECT Name, Emp_Name__c, Email__c, Birth_Date__c, Department__c
+            FROM Employee__c
+            ORDER BY Name
+        ];
+
+        if (empList.isEmpty()) {
+            System.debug('No employees found.');
+            return;
+        }
+
+        System.debug('===== All Employees =====');
+        for (Employee__c e : empList) {
+            System.debug(
+                'ID: '       + e.Name
+              + ' | Name: '  + e.Emp_Name__c
+              + ' | Email: ' + e.Email__c
+              + ' | DOB: '   + e.Birth_Date__c
+              + ' | Dept: '  + e.Department__c
+            );
+        }
+    }
+
+    // ── 3. SEARCH Employee by auto-number Name (e.g. 'EMP-0001') ─────────
+    public static void searchEmployee(String empName) {
+        List<Employee__c> result = [
+            SELECT Name, Emp_Name__c, Email__c, Birth_Date__c, Department__c
+            FROM Employee__c
+            WHERE Name = :empName
+            LIMIT 1
+        ];
+
+        if (result.isEmpty()) {
+            System.debug('Employee ' + empName + ' not found.');
+        } else {
+            Employee__c e = result[0];
+            System.debug(
+                'Found — ID: ' + e.Name
+              + ' | Name: '    + e.Emp_Name__c
+              + ' | Email: '   + e.Email__c
+              + ' | DOB: '     + e.Birth_Date__c
+              + ' | Dept: '    + e.Department__c
+            );
+        }
+    }
+
+    // ── 4. UPDATE Employee Department ─────────────────────────────────────
+    public static void updateDepartment(String empName, String newDept) {
+        List<Employee__c> result = [
+            SELECT Id, Department__c FROM Employee__c WHERE Name = :empName LIMIT 1
+        ];
+
+        if (result.isEmpty()) {
+            System.debug('Employee ' + empName + ' not found.');
+            return;
+        }
+
+        result[0].Department__c = newDept;
+        update result[0];
+        System.debug('Department updated for ' + empName + ' -> ' + newDept);
+    }
+
+    // ── 5. DELETE Employee ────────────────────────────────────────────────
+    public static void deleteEmployee(String empName) {
+        List<Employee__c> result = [
+            SELECT Id FROM Employee__c WHERE Name = :empName LIMIT 1
+        ];
+
+        if (result.isEmpty()) {
+            System.debug('Employee ' + empName + ' not found.');
+            return;
+        }
+
+        delete result[0];
+        System.debug('Employee ' + empName + ' deleted.');
+    }
+}
+
+// Add
+// EmployeeManagementSystem.addEmployee('Alice', 'alice@corp.com', Date.newInstance(1998, 3, 10), 'HR');
+// EmployeeManagementSystem.addEmployee('Bob', 'bob@corp.com', Date.newInstance(1995, 7, 22), 'Engineering');
+
+// View all
+// EmployeeManagementSystem.viewAllEmployees();
+
+// Search
+// EmployeeManagementSystem.searchEmployee('EMP-0001');
+
+// Update department
+// EmployeeManagementSystem.updateDepartment('EMP-0001', 'Finance');
+
+// Delete
+// EmployeeManagementSystem.deleteEmployee('EMP-0002');
