@@ -1,5 +1,6 @@
 A 7 & 12 Static Website
 https://github.com/AsleshaPS/static_website.git
+python -m http.server 3000
 
 A 9 Blog app:
 https://github.com/Dantheman2606/blog-app.git
